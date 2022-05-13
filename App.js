@@ -11,20 +11,33 @@ import RecentExpenses from './screens/RecentExpenses';
 import AllExpenses from './screens/AllExpenses';
 
 import { GlobalStyles } from './constants/styles';
+import IconButton from './components/UI/IconButton';
 
 const Stack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
 
 function ExpensesOverview() {
   return (
+    // We can also pass 'object' or 'function' to screenOptions
+    // Using 'function'  allow us to get some props for using.
+
     <BottomTabs.Navigator 
-      screenOptions={{
+      screenOptions={({ navigation })=>({  
         headerStyle:{ backgroundColor: GlobalStyles.colors.primary500 },
         headerTintColor: 'white',
         tabBarStyle:{ backgroundColor: GlobalStyles.colors.primary500 },
         tabBarActiveTintColor: GlobalStyles.colors.accent500,
-      }}>  
 
+        headerRight: ({tintColor}) => ( 
+          <IconButton 
+            icon="add" 
+            size={24} 
+            color={tintColor} 
+            onPress={()=>{
+              navigation.navigate('ManageExpense');
+            }} />
+        ),
+      })}>  
       
       <BottomTabs.Screen 
         name="RecentExpenses" 
@@ -57,7 +70,10 @@ export default function App() {
     <>
       <StatusBar style="light" />
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator screenOptions={{
+          headerStyle:{ backgroundColor: GlobalStyles.colors.primary500 },
+          headerTintColor: 'white',
+        }}>
 
           <Stack.Screen 
             name="ExpenseOverview" 
@@ -68,6 +84,11 @@ export default function App() {
           <Stack.Screen 
             name="ManageExpense" 
             component={ManageExpense} 
+            options={{ 
+              // NEW Concept HERE : How screen will be loaded
+              // Look different especially on iOS
+               presentation: 'modal',
+            }}
           />
         
         </Stack.Navigator>
