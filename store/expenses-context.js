@@ -57,8 +57,8 @@ function expensesReducer(state, action) {
 
       // 1.Get position in old Array (current state)
         const updatableExpenseIndex = state.findIndex(
-          (item)=>{item.id === action.payload.id})              
-
+          (expense)=> expense.id === action.payload.id )   
+          
       // 2.Get old Object from Array
         const updatableExpense = state[updatableExpenseIndex];  
         
