@@ -12,6 +12,7 @@ import AllExpenses from './screens/AllExpenses';
 
 import { GlobalStyles } from './constants/styles';
 import IconButton from './components/UI/IconButton';
+import ExpenseContextProvider from './store/expenses-context';
 
 const Stack = createNativeStackNavigator();
 const BottomTabs = createBottomTabNavigator();
@@ -69,30 +70,32 @@ export default function App() {
   return (
     <>
       <StatusBar style="light" />
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{
-          headerStyle:{ backgroundColor: GlobalStyles.colors.primary500 },
-          headerTintColor: 'white',
-        }}>
+      <ExpenseContextProvider>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{
+            headerStyle:{ backgroundColor: GlobalStyles.colors.primary500 },
+            headerTintColor: 'white',
+          }}>
 
-          <Stack.Screen 
-            name="ExpenseOverview" 
-            component={ExpensesOverview} 
-            options={{headerShown: false}}
-          />
+            <Stack.Screen 
+              name="ExpenseOverview" 
+              component={ExpensesOverview} 
+              options={{headerShown: false}}
+            />
+            
+            <Stack.Screen 
+              name="ManageExpense" 
+              component={ManageExpense} 
+              options={{ 
+                // NEW Concept HERE : How screen will be loaded
+                // Look different especially on iOS
+                presentation: 'modal',
+              }}
+            />
           
-          <Stack.Screen 
-            name="ManageExpense" 
-            component={ManageExpense} 
-            options={{ 
-              // NEW Concept HERE : How screen will be loaded
-              // Look different especially on iOS
-               presentation: 'modal',
-            }}
-          />
-        
-        </Stack.Navigator>
-      </NavigationContainer>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ExpenseContextProvider>
     </>
   );
 }
