@@ -90,6 +90,7 @@ export default function App() {
                 // NEW Concept HERE : How screen will be loaded
                 // Look different especially on iOS
                 presentation: 'modal',
+                animation: 'slide_from_bottom',
               }}
             />
           
