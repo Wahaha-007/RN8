@@ -1,37 +1,37 @@
 import { createContext, useReducer } from 'react';
 
-const DUMMY_EXPENSES = [
-  {
-    id: 'e1',
-    description: 'A pair of shoes',
-    amount: 59.99,
-    date: new Date('2021-12-19'),
-  },
-  {
-    id: 'e2',
-    description: 'A pair of trousers',
-    amount: 89.29,
-    date: new Date('2022-01-05'),
-  },
-  {
-    id: 'e3',
-    description: 'Some bananas',
-    amount: 5.99,
-    date: new Date('2021-12-01'),
-  },
-  {
-    id: 'e4',
-    description: 'A book',
-    amount: 14.99,
-    date: new Date('2022-05-08'),
-  },
-  {
-    id: 'e5',
-    description: 'Another book',
-    amount: 18.59,
-    date: new Date('2022-05-10'),
-  },
-];
+// const DUMMY_EXPENSES = [
+//   {
+//     id: 'e1',
+//     description: 'A pair of shoes',
+//     amount: 59.99,
+//     date: new Date('2021-12-19'),
+//   },
+//   {
+//     id: 'e2',
+//     description: 'A pair of trousers',
+//     amount: 89.29,
+//     date: new Date('2022-01-05'),
+//   },
+//   {
+//     id: 'e3',
+//     description: 'Some bananas',
+//     amount: 5.99,
+//     date: new Date('2021-12-01'),
+//   },
+//   {
+//     id: 'e4',
+//     description: 'A book',
+//     amount: 14.99,
+//     date: new Date('2022-05-08'),
+//   },
+//   {
+//     id: 'e5',
+//     description: 'Another book',
+//     amount: 18.59,
+//     date: new Date('2022-05-10'),
+//   },
+// ];
 
 
 // ******* Planning for Global variable here :) ********
@@ -39,6 +39,7 @@ const DUMMY_EXPENSES = [
 export const ExpenseContext = createContext({
   expenses: [],
   addExpense: ({description, amout, date})=> {},
+  setExpenses: (expenses) => {},  // Like update the whole array, not just one element
   deleteExpense: (id) => {},
   updateExpense: (id, {description, amout, date})=> {},
 });
@@ -50,8 +51,16 @@ function expensesReducer(state, action) {
   switch(action.type) {
     case 'ADD':
         //const id  = uuidv4();
-        const id = new Date().toString() + Math.random().toString();
-        return [{...action.payload, id: id}, ...state]
+        //const id = new Date().toString() + Math.random().toString();
+        //return [{...action.payload, id: id}, ...state]
+        return [action.payload, ...state];
+
+    case 'SET':
+        // in Database Newest item comes last
+        const inverted = action.payload.reverse(); 
+
+        // in our Context Newest item comes first
+        return inverted;
 
     case 'UPDATE':
 
@@ -83,10 +92,14 @@ function expensesReducer(state, action) {
 
 const ExpenseContextProvider = ({children}) => {
 
-  const [expenesesState, dispatch] = useReducer(expensesReducer, DUMMY_EXPENSES);  
+  const [expenesesState, dispatch] = useReducer(expensesReducer, []); //DUMMY_EXPENSES);  
 
   const addExpense = (expenseData) => {
     dispatch({ type: 'ADD', payload: expenseData });
+  }
+
+  const setExpenses = (expenses) => {
+    dispatch({ type: 'SET', payload: expenses });
   }
 
   const deleteExpense =(id) => {
@@ -100,6 +113,7 @@ const ExpenseContextProvider = ({children}) => {
   const value = {
     expenses: expenesesState,
     addExpense: addExpense,
+    setExpenses: setExpenses,
     deleteExpense: deleteExpense,
     updateExpense: updateExpense
   };

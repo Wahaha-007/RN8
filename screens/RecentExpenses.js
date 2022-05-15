@@ -1,11 +1,31 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
+import { useEffect } from 'react';
 import ExpensesOutput from '../components/ExpensesOutput/ExpensesOutput';
+import LoadingOverlay from '../components/UI/LoadingOverlay';
 import { ExpenseContext } from '../store/expenses-context';
 import { getDateMinusDays } from '../util.js/date';
+import { fetchExpenses } from '../util.js/http';
 
 const RecentExpenses = () => {
 
-  expensesCtx = useContext(ExpenseContext);
+  const [isFetching, setIsFetching] = useState(true);
+  const expensesCtx = useContext(ExpenseContext);
+  // const [fetchedExpenses, setFetchedExpenses] = useState([]);
+
+  useEffect(() => {
+    async function getExpenses() {
+      setIsFetching(true);
+      const expenses = await fetchExpenses();
+      setIsFetching(false);
+      expensesCtx.setExpenses(expenses);
+    }
+
+    getExpenses();  /// useEffect function itslef cannot be async
+  },[]);
+
+  if (isFetching) {   // Just trap the sequence HERE ! code below not execute !
+    return <LoadingOverlay />
+  }
 
   const recentExpenses = expensesCtx.expenses.filter((expense)=>{
 

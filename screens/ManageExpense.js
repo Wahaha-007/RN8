@@ -1,13 +1,16 @@
-import { useLayoutEffect, useContext } from 'react';
+import { useLayoutEffect, useContext, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import IconButton from '../components/UI/IconButton';
 import { GlobalStyles } from '../constants/styles';
 import { ExpenseContext } from '../store/expenses-context';
 import ExpenseForm from '../components/ManageExpense/ExpenseForm';
+import { deleteExpense, storeExpense, updateExpense } from '../util.js/http';
+import LoadingOverlay from '../components/UI/LoadingOverlay';
 
 function ManageExpense({ route, navigation }) {
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
 
@@ -20,8 +23,12 @@ function ManageExpense({ route, navigation }) {
     });
   }, [navigation, isEditing]);
 
-  function deleteExpenseHandler() {
+  async function deleteExpenseHandler() {
+    setIsSubmitting(true);
+    await deleteExpense(editedExpenseId);
+    // setIsSubmitting(false); // We need to change page after completion
     expensesCtx.deleteExpense(editedExpenseId);
+
     navigation.goBack(); 
   }
 
@@ -29,15 +36,24 @@ function ManageExpense({ route, navigation }) {
     navigation.goBack();    // Equal to closing the modal
   }
 
-  function confirmHandler(expenseData) {
+  async function confirmHandler(expenseData) {
+
+    setIsSubmitting(true);
 
     if(isEditing){
-      expensesCtx.updateExpense(editedExpenseId, expenseData);    
+      expensesCtx.updateExpense(editedExpenseId, expenseData);   
+      await updateExpense(editedExpenseId, expenseData); 
     } else {
-        expensesCtx.addExpense(expenseData);
+      const id = await storeExpense(expenseData);  
+      expensesCtx.addExpense({...expenseData, id: id});
     }
     navigation.goBack();
   }
+
+  if (isSubmitting) {
+    return <LoadingOverlay />
+  }
+
 
   /* mode == flat => without backgrund color */
   return (
